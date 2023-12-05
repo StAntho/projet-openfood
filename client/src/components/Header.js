@@ -16,8 +16,7 @@ export default function Header() {
     setIsMenuOpen(false);
   };
 
-  const loagout = () => {
-    console.log(userInfo);
+  const logout = () => {
     dispatch({ type: "USER_SIGN_OUT" });
     localStorage.removeItem("userInfo");
   };
@@ -72,7 +71,7 @@ export default function Header() {
             )}
             {userInfo && userInfo !== null ? (
               <li className="nav__item">
-                <NavLink onClick={loagout} to="/" className="nav__link">
+                <NavLink onClick={logout} to="/" className="nav__link">
                   <i className="ri-logout-box-line"></i> Déconnexion
                 </NavLink>
               </li>
