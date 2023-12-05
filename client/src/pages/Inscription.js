@@ -20,7 +20,7 @@ export default function Inscription({ setTest }) {
     e.preventDefault();
     try {
       const data = await axios.post(
-        `http://127.0.0.1:8000/register/`,
+        `http://127.0.0.1:8000/api/user/register/`,
         userdata
       );
       if (data.data.user !== undefined) {
@@ -45,7 +45,7 @@ export default function Inscription({ setTest }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await axios.post(`http://127.0.0.1:8000/login/`, userdata);
+      const data = await axios.post(`http://127.0.0.1:8000/api/user/signin/${userdata.username}`, userdata);
 
       let userInfo = {
         token: data.data.token,
@@ -83,13 +83,13 @@ export default function Inscription({ setTest }) {
         <div className="signup">
           <form onSubmit={handleSignup}>
             <label className="signup-label" htmlFor="chk" aria-hidden="true">
-              Sign up
+              Inscription
             </label>
             <input
               className="signup-input"
               type="text"
               name="username"
-              placeholder="User name"
+              placeholder="Pseudo"
               required=""
               onChange={handleChange}
             />
@@ -97,7 +97,7 @@ export default function Inscription({ setTest }) {
               className="signup-input"
               type="text"
               name="first_name"
-              placeholder="First name"
+              placeholder="Prénom"
               required=""
               onChange={handleChange}
             />
@@ -105,7 +105,7 @@ export default function Inscription({ setTest }) {
               className="signup-input"
               type="text"
               name="last_name"
-              placeholder="Last name"
+              placeholder="Nom de famille"
               required=""
               onChange={handleChange}
             />
@@ -113,7 +113,7 @@ export default function Inscription({ setTest }) {
               className="signup-input"
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="Adresse e-mail"
               required=""
               onChange={handleChange}
             />
@@ -121,24 +121,24 @@ export default function Inscription({ setTest }) {
               className="signup-input"
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Mot de passe"
               required=""
               onChange={handleChange}
             />
-            <button className="signup-button">Sign up</button>
+            <button className="signup-button">Inscription</button>
           </form>
         </div>
 
         <div className="login">
           <form onSubmit={handleLogin}>
             <label className="login-label" htmlFor="chk" aria-hidden="true">
-              Login
+              Se connecter
             </label>
             <input
               className="login-input"
               type="text"
               name="username"
-              placeholder="Username"
+              placeholder="Adresse e-mail"
               required=""
               onChange={handleChange}
             />
@@ -146,11 +146,11 @@ export default function Inscription({ setTest }) {
               className="login-input"
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Mot de passe"
               required=""
               onChange={handleChange}
             />
-            <button className="login-button">Login</button>
+            <button className="login-button">Se connecter</button>
           </form>
         </div>
       </div>

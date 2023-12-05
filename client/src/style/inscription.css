@@ -89,7 +89,8 @@
 }
 
 #chk:checked~.login label {
-  transform: scale(1);
+  transform: scale(0.9);
+  padding-top: 1rem;
 }
 
 #chk:checked~.signup label {
