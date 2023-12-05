@@ -56,6 +56,7 @@ export default {
           mail: users.mail,
           is_admin: users.is_admin,
           token: generateToken(users),
+          products: users.products
         });
       }
     } catch (error) {
@@ -90,9 +91,9 @@ export default {
         firstname: user.firstname,
         mail: user.mail,
         username: user.username,
-        // password: user.password,
         is_admin: user.is_admin,
         token: generateToken(user),
+        products: user.products
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -130,6 +131,7 @@ export default {
         mail: updatedUser.mail,
         is_admin: updatedUser.is_admin,
         token: generateToken(updatedUser),
+        products: updatedUser.products
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  products: {
+    type: Object,
+    required: true,
+    default: {}
+  }
 });
 
 const User = mongoose.model("User", userSchema);
