@@ -1,12 +1,13 @@
 import "../style/header.css";
 import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "remixicon/fonts/remixicon.css";
+import { useUser } from "./UserContext";
 
-let v;
-export default function Header({ test, setTest }) {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [role, setRole] = useState();
+  const { state, dispatch } = useUser();
+  const { userInfo } = state;
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -16,26 +17,16 @@ export default function Header({ test, setTest }) {
   };
 
   const loagout = () => {
+    console.log(userInfo);
+    dispatch({ type: "USER_SIGN_OUT" });
     localStorage.removeItem("userInfo");
-    setTest(localStorage.getItem("userInfo"));
   };
-
-  useEffect(() => {
-    if (typeof test === "object" && test !== null) {
-      setRole(test.is_superuser);
-    } else if (typeof test !== "object" && test !== null) {
-      v = JSON.parse(test);
-      setRole(v.is_superuser);
-    } else if (typeof v === "undefined" || typeof v === []) {
-      setRole("");
-    }
-  }, [test]);
 
   return (
     <header className="header" id="header">
       <nav className="nav container">
         <NavLink onClick={closeMenu} to="/" className="nav__logo">
-          Mon Siège de Rêve
+          Ratatouille
         </NavLink>
 
         <div
@@ -44,18 +35,30 @@ export default function Header({ test, setTest }) {
         >
           <ul className="nav__list grid">
             <li className="nav__item">
-              <NavLink onClick={closeMenu} to="/" className={({ isActive }) => (isActive ? "nav__link active-link" : "nav__link")}>
-                <i className="ri-coupon-2-line"></i> Séances
+              <NavLink
+                onClick={closeMenu}
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? "nav__link active-link" : "nav__link"
+                }
+              >
+                <i className="ri-coupon-2-line"></i> Produits
               </NavLink>
             </li>
-            {test !== null && (
+            {userInfo && userInfo !== null && (
               <li className="nav__item">
-                <NavLink onClick={closeMenu} to="/account" className={({ isActive }) => (isActive ? "nav__link active-link" : "nav__link")}>
+                <NavLink
+                  onClick={closeMenu}
+                  to="/account"
+                  className={({ isActive }) =>
+                    isActive ? "nav__link active-link" : "nav__link"
+                  }
+                >
                   <i className="ri-account-circle-line"></i> Mon compte
                 </NavLink>
               </li>
             )}
-            {test !== null && role === true && (
+            {userInfo && userInfo.is_admin === 1 && (
               <li className="nav__item">
                 <NavLink
                   onClick={closeMenu}
@@ -67,20 +70,22 @@ export default function Header({ test, setTest }) {
                 </NavLink>
               </li>
             )}
-            {test === null ? (
+            {userInfo && userInfo !== null ? (
               <li className="nav__item">
-                <NavLink
-                  onClick={closeMenu}
-                  to="/inscription"
-                  className={({ isActive }) => (isActive ? "nav__link active-link" : "nav__link")}
-                >
-                  <i className="ri-account-circle-line"></i> Inscription
+                <NavLink onClick={loagout} to="/" className="nav__link">
+                  <i className="ri-logout-box-line"></i> Déconnexion
                 </NavLink>
               </li>
             ) : (
               <li className="nav__item">
-                <NavLink onClick={loagout} to="/" className="nav__link">
-                  <i className="ri-logout-box-line"></i> Logout
+                <NavLink
+                  onClick={closeMenu}
+                  to="/inscription"
+                  className={({ isActive }) =>
+                    isActive ? "nav__link active-link" : "nav__link"
+                  }
+                >
+                  <i className="ri-account-circle-line"></i> Inscription
                 </NavLink>
               </li>
             )}

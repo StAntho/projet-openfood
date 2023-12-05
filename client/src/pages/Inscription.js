@@ -3,12 +3,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export default function Inscription({ setTest }) {
+import { getErrorFromBackend } from "./../utils";
+import { toast } from "react-toastify";
+import { useUser } from "../components/UserContext";
+
+export default function Inscription() {
   const navigate = useNavigate();
   const { search } = useLocation();
   const redirectUrl = new URLSearchParams(search).get("redirect");
   const redirect = redirectUrl ? redirectUrl : "/";
   const [userdata, setUserdata] = useState([]);
+  const { state, dispatch } = useUser();
+  const { userInfo } = state;
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -23,53 +29,35 @@ export default function Inscription({ setTest }) {
         `http://127.0.0.1:8000/api/user/register/`,
         userdata
       );
-      if (data.data.user !== undefined) {
-        let userInfo = {
-          token: data.data.token,
-          username: data.data.user.username,
-          email: data.data.user.email,
-          first_name: data.data.user.first_name,
-          last_name: data.data.user.last_name,
-          id: data.data.user.id,
-          is_superuser: data.data.user.is_superuser,
-        };
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setTest(localStorage.getItem("userInfo"));
-        navigate(redirect || "/");
-      }
+
+      dispatch({ type: "USER_SIGNIN", payload: data.data });
+      localStorage.setItem("userInfo", JSON.stringify(data.data));
+      navigate(redirect || "/");
     } catch (error) {
-      console.log(error);
+      toast.error(getErrorFromBackend(error));
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await axios.post(`http://127.0.0.1:8000/api/user/signin/${userdata.username}`, userdata);
-
-      let userInfo = {
-        token: data.data.token,
-        username: data.data.username,
-        email: data.data.email,
-        first_name: data.data.first_name,
-        last_name: data.data.last_name,
-        id: data.data.id,
-        is_superuser: data.data.is_superuser,
-      };
-
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      setTest(localStorage.getItem("userInfo"));
+      const data = await axios.post(
+        `http://127.0.0.1:8000/api/user/signin/${userdata.username}`,
+        userdata
+      );
+      dispatch({ type: "USER_SIGNIN", payload: data.data });
+      localStorage.setItem("userInfo", JSON.stringify(data.data));
       navigate(redirect || "/");
     } catch (error) {
-      console.log(error);
+      toast.error(getErrorFromBackend(error));
     }
   };
 
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem("userInfo"))) {
+    if (userInfo) {
       navigate(redirect);
     }
-  }, [navigate, redirect]);
+  }, [navigate, redirect, userInfo]);
 
   return (
     <div className="login-signup-body">
