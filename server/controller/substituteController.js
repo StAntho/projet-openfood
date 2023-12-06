@@ -3,7 +3,7 @@ import { generateToken } from "./../auth/authentification.js";
 
 export default {
   getSubstitutes: async (req, res) => {
-    const { userId } = req.body;
+    const { userId } = req.params;
 
     try {
       const user = await User.findById(userId);
@@ -17,8 +17,7 @@ export default {
   },
 
   getSubstituteById: async (req, res) => {
-    const { id } = req.params;
-    const { userId } = req.body;
+    const { userId, id } = req.params;
 
     try {
       const user = await User.findById(userId);
