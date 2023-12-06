@@ -3,9 +3,11 @@ import "../style/Dashboard.css";
 import { useEffect, useState } from "react";
 import { getErrorFromBackend } from "./../utils";
 import { useUser } from "../components/UserContext";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
+  const [usersProducts, setUsersProducts] = useState([]);
   const [search, setSearch] = useState([]);
   const [substitute, setSubstitute] = useState([]);
   const { state } = useUser();
@@ -14,53 +16,39 @@ export default function Dashboard() {
 
   useEffect(() => {
     const listUser = async () => {
-      const response = await axios.get("http://127.0.0.1:8000/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
       try {
+        const response = await axios.get("http://127.0.0.1:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         setUsers(response.data);
+        setUsersProducts(response.data.map((user) => user.products));
       } catch (error) {
-        console.error(getErrorFromBackend(error));
+        toast.error(getErrorFromBackend(error));
       }
     };
     listUser();
   }, [token]);
 
   useEffect(() => {
-    const products = users.map((user) => user.products);
-    const searchIds = [];
-    const substituteIds = [];
-    // const searchsearch = Object.assign({}, searchIds);
-    console.log(searchIds);
-    console.log(substituteIds);
-
-    for (let i = 0; i < products.length; i++) {
-      if (products[i] !== undefined) {
-        Object.keys(products[i]).forEach((key) => {
-          searchIds.push(key);
-          substituteIds.push(products[i][key]);
-        });
+    Object.entries(usersProducts).map(([key, substitut]) => {
+      if (substitut === undefined) {
+        return "";
       }
-    }
-
-    const searchf = searchIds.forEach((idsearch) => {
-      const listSearch = async () => {
+      Object.entries(substitut).map(async ([searchId, substitutId]) => {
         try {
-          const response = await axios.get(
-            `https://world.openfoodfacts.net/api/v2/product/${idsearch}`
-          );
-          console.log(response.data);
-          setSearch((values) => ({ ...values, [search]: response.data }));
+          const searchResponse = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${searchId}`);
+          setSearch((values) => ({ ...values, [searchId]: searchResponse.data.product }));
+          const substitutResponse = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${substitutId}`);
+          setSubstitute((values) => ({ ...values, [substitutId]: substitutResponse.data.product }));
         } catch (error) {
-          console.error(getErrorFromBackend(error));
+          toast.error(getErrorFromBackend(error));
         }
-      };
-      listSearch();
+      })
+      return "";
     });
-  }, []);
-  console.log(search);
+  }, [usersProducts]);
 
   return (
     <div>
@@ -79,7 +67,7 @@ export default function Dashboard() {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
+            <tr key={user._id}>
               <td>{user._id}</td>
               <td>{user.name}</td>
               <td>{user.firstname}</td>
@@ -101,15 +89,38 @@ export default function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {search.forEach((s) => {
-            <tr key={s._id}>
-              <td>{s._id}</td>
-              <td>{s.product_name_fr}</td>
-              <td>{s.categories}</td>
-              <td>{s.mail}</td>
-              <td>{s.stores}</td>
-            </tr>;
-          })}
+          {Object.keys(search).map((key) => (
+            <tr key={key}>
+              <td>{search[key].id}</td>
+              <td>{search[key].product_name_fr}</td>
+              <td>{search[key].categories}</td>
+              <td>{search[key].mail}</td>
+              <td>{search[key].stores}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h2>Substituts</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nom</th>
+            <th>Catégories</th>
+            <th>Email</th>
+            <th>Magazins</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.keys(substitute).map((key) => (
+            <tr key={key}>
+              <td>{substitute[key].id}</td>
+              <td>{substitute[key].product_name_fr}</td>
+              <td>{substitute[key].categories}</td>
+              <td>{substitute[key].mail}</td>
+              <td>{substitute[key].stores}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
