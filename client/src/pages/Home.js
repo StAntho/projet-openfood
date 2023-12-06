@@ -84,79 +84,82 @@ export default function Home() {
 
   if (onLoad === 1) {
     return (
-      <div className='section'>
-        <div className="loader"></div>
-      </div>
+      <span className="homepage">
+        <div className='section'>
+          <div className="loader"></div>
+        </div>
+      </span>
     );
   }
 
   return (
-    <div className='section'>
-      <select value={selectCat} onChange={handleCatChange}>
-        <option value="">-- Choisissez votre catégorie --</option>
-        {Object.entries(categories).map(([key, value]) => (
-          <option key={key} value={key}>{value}</option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="Recherche par nom..."
-        value={searchText}
-        onChange={handleSearchChange}
-      />
-      <section className="cards" >
-        {
-          productsReplace.length > 0 ? (
-            <>
-              <h2>Produits similaires</h2>
-              <button className='retour-btn' onClick={(e) => { setProductsReplace([]); }}>Retour à la liste des catégories</button>
-              <div className='grid'>
-                {productsReplace.map((product, index) => (
-                  <article key={index} className="card">
-                    <div className="card__info-hover">
-                    </div>
-                    <div className="card__img"></div>
-                    <a href="#" className="card_link">
-                      <div style={{
-                        backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
-                      }} className="card__img--hover"></div>
-                    </a>
-                    <div className="card__info">
-                      <h3 className="card__title">{product.product_name_fr}</h3>
-                      <button onClick={() => console.log('fonction substitut')}>Définir substitut</button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </>
-          ) : products.length > 0 ? (
-            <>
-              <h2>Produits de la catégorie</h2>
-              <div className='grid'>
-                {products.map((product, index) => (
-                  <article key={index} className="card">
-                    <div className="card__info-hover">
-                    </div>
-                    <div className="card__img"></div>
-                    <a href="#" className="card_link">
-                      <div style={{
-                        backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
-                      }} className="card__img--hover"></div>
-                    </a>
-                    <div className="card__info">
-                      <h3 className="card__title">{product.product_name_fr}</h3>
-                      <button onClick={() => handleToReplace(product)}>Voir similaires</button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p>Aucun produit trouvé.</p>
-          )
-        }
-      </section>
-    </div >
+    <span className="homepage">
+      <div className='section'>
+        <select value={selectCat} onChange={handleCatChange}>
+          <option value="">-- Choisissez votre catégorie --</option>
+          {Object.entries(categories).map(([key, value]) => (
+            <option key={key} value={key}>{value}</option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Recherche par nom..."
+          value={searchText}
+          onChange={handleSearchChange}
+        />
+        <section className="cards" >
+          {
+            productsReplace.length > 0 ? (
+              <>
+                <h2>Produits similaires</h2>
+                <button className='retour-btn' onClick={(e) => { setProductsReplace([]); }}>Retour à la liste des catégories</button>
+                <div className='grid'>
+                  {productsReplace.map((product, index) => (
+                    <article key={index} className="card">
+                      <div className="card__info-hover">
+                      </div>
+                      <div className="card__img"></div>
+                      <a href="#" className="card_link">
+                        <div style={{
+                          backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
+                        }} className="card__img--hover"></div>
+                      </a>
+                      <div className="card__info">
+                        <h3 className="card__title">{product.product_name_fr}</h3>
+                        <button onClick={() => console.log('fonction substitut')}>Définir substitut</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            ) : products.length > 0 ? (
+              <>
+                <h2>Produits de la catégorie</h2>
+                <div className='grid'>
+                  {products.map((product, index) => (
+                    <article key={index} className="card">
+                      <div className="card__info-hover">
+                      </div>
+                      <div className="card__img"></div>
+                      <a href="#" className="card_link">
+                        <div style={{
+                          backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
+                        }} className="card__img--hover"></div>
+                      </a>
+                      <div className="card__info">
+                        <h3 className="card__title">{product.product_name_fr}</h3>
+                        <button onClick={() => handleToReplace(product)}>Voir similaires</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p>Aucun produit trouvé.</p>
+            )
+          }
+        </section>
+      </div>
+    </span>
   )
-
 };
