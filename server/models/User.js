@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     type: Object,
     required: true,
     default: {}
+  },
+  allergen: {
+    type: [String],
+    required: true,
+    default: []
   }
 });
 

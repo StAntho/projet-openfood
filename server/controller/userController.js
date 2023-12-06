@@ -56,7 +56,8 @@ export default {
           mail: users.mail,
           is_admin: users.is_admin,
           token: generateToken(users),
-          products: users.products
+          products: users.products,
+          allergen: users.allergen
         });
       }
     } catch (error) {
@@ -93,7 +94,8 @@ export default {
         username: user.username,
         is_admin: user.is_admin,
         token: generateToken(user),
-        products: user.products
+        products: user.products,
+        allergen: user.allergen
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -105,14 +107,15 @@ export default {
    */
   updateUser: async (req, res) => {
     const { id } = req.params;
-    const { name, firstname, mail, is_admin, password, username } = req.body;
+    const { name, firstname, mail, is_admin, password, username, allergen } = req.body;
     try {
       const user = await User.findById(id);
       user.name = name || user.name;
       user.firstname = firstname || user.firstname;
       user.mail = mail || user.mail;
       user.username = username || user.username;
-      user.is_admin = is_admin;
+      user.is_admin = is_admin || user.is_admin;
+      user.allergen = allergen || user.allergen;
       if (password === "" || password === undefined) {
         user.password = user.password;
       } else {
@@ -131,9 +134,11 @@ export default {
         mail: updatedUser.mail,
         is_admin: updatedUser.is_admin,
         token: generateToken(updatedUser),
-        products: updatedUser.products
+        products: updatedUser.products,
+        allergen: updatedUser.allergen
       });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: "Internal server error" });
     }
   },

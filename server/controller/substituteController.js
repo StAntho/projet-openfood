@@ -54,7 +54,8 @@ export default {
         mail: updatedUser.mail,
         is_admin: updatedUser.is_admin,
         token: generateToken(updatedUser),
-        products: updatedUser.products
+        products: updatedUser.products,
+        allergen: updatedUser.allergen
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

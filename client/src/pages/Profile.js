@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { all } from "axios";
 import "../style/profile.css";
 import Modal from "react-modal";
 import AccountModal from "../components/AccountModal";
@@ -13,6 +13,38 @@ export default function Profile() {
   const { state, dispatch } = useUser();
   const { userInfo } = state;
   const [modalAccountIsOpen, setModalAccountIsOpen] = useState(false);
+  const [allergens, setAllergens] = useState([]);
+  const [textAllergen, setTextAllergen] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response = await axios.get('https://world.openfoodfacts.org/data/taxonomies/allergens.json');
+        setAllergens(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSelectChange = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await axios.patch(
+        `http://localhost:8000/api/user/update/${userInfo._id}`,
+        { allergen: [...userInfo.allergen, textAllergen] },
+        { headers: { Authorization: `Bearer ${userInfo.token}` } }
+      );
+      dispatch({ type: "USER_SIGNIN", payload: data.data });
+      localStorage.setItem("userInfo", JSON.stringify(data.data));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   // const [modalSubstituteIsOpen, setModalSubstituteIsOpen] = useState(false);
   // const [selectedPurchase, setSelectedPurchase] = useState(null);
 
@@ -177,6 +209,7 @@ export default function Profile() {
                   ))} */}
                 </tbody>
               </table>
+
               {/* <Modal
                 style={{
                   overlay: {
@@ -201,6 +234,27 @@ export default function Profile() {
               >
                 <AccountModal data={userInfo} closeModal={closeModalAccount} />
               </Modal>
+            </div>
+          </div>
+          <div className="nave">
+            <ul>
+              <li className="user-review active">Configurer vos alergies</li>
+            </ul>
+          </div>
+          <div className="profile-body">
+            <div className="profile-reviews tab">
+              <form onSubmit={handleSelectChange}>
+                <select onChange={(e) => setTextAllergen(e.target.value)}>
+                  <option value=''>Choisissez votre allergène</option>
+                  {Object.keys(allergens).map(key => (
+                    <option selected={textAllergen == key} key={key} value={key}>{allergens[key]?.name?.fr}</option>
+                  ))}
+                </select>
+                <input type='submit' />
+              </form>
+              {userInfo?.allergen?.map((allergen) => (
+                <p>{allergens[allergen].name.fr}</p>
+              ))}
             </div>
           </div>
         </div>
