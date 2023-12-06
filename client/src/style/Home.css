@@ -167,7 +167,7 @@
   }
 }
 
-.grid {
+.homepage .grid {
   margin-left: 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -177,7 +177,7 @@
 }
 
 
-.grid p {
+.homepage .grid p {
   aspect-ratio: 1/1;
   background-size: cover;
   background-position: center;
@@ -191,7 +191,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.grid p a {
+.homepage .grid p a {
   color: white;
   text-decoration: none;
   text-align: center;
@@ -201,19 +201,19 @@
   width: 100%;
 }
 
-.grid p:hover {
+.homepage .grid p:hover {
   transform: scale(1.1);
   transition: transform 0.5s ease;
 }
 
-.section h2 {
+.homepage .section h2 {
   color: #333;
   font-size: 1.5em;
   margin-bottom: 20px;
   text-align: center;
 }
 
-.section button {
+.homepage .section button {
   color: black;
   background-color: #007bff00;
   border: 1px solid black;
@@ -224,17 +224,17 @@
   transition: background-color 0.3s;
 }
 
-.section button:hover {
+.homepage .section button:hover {
   background-color: #000000;
   color: white;
 }
 
-.section .retour-btn {
+.homepage .section .retour-btn {
   background-color: #f8f9fa;
   color: #333;
 }
 
-.section select {
+.homepage .section select {
   width: 100%;
   padding: 10px 15px;
   margin-bottom: 20px;
@@ -249,12 +249,12 @@
   appearance: none;
 }
 
-.section select:focus {
+.homepage .section select:focus {
   outline: none;
   border-color: #007bff;
 }
 
-.loader {
+.homepage .loader {
   border: 5px solid #f3f3f3;
   border-top: 5px solid #3498db;
   border-radius: 50%;
@@ -277,12 +277,7 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab:100,300,400,700');
 @import url('https://fonts.googleapis.com/css?family=Raleway:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i');
 
-* {
-  box-sizing: border-box;
-}
-
-body,
-html {
+.homepage {
   font-family: 'Roboto Slab', serif;
   margin: 0;
   width: 100%;
@@ -290,32 +285,32 @@ html {
   padding: 0;
 }
 
-.cards {
+.homepage .cards {
   width: 100%;
 }
 
-.card__like {
+.homepage .card__like {
   width: 18px;
 }
 
-.card__clock {
+.homepage .card__clock {
   width: 15px;
   vertical-align: middle;
   fill: #AD7D52;
 }
 
-.card__time {
+.homepage .card__time {
   font-size: 12px;
   color: #AD7D52;
   vertical-align: middle;
   margin-left: 5px;
 }
 
-.card__clock-info {
+.homepage .card__clock-info {
   float: right;
 }
 
-.card__img {
+.homepage .card__img {
   visibility: hidden;
   background-size: cover;
   background-position: center;
@@ -327,7 +322,7 @@ html {
 
 }
 
-.card__info-hover {
+.homepage .card__info-hover {
   position: absolute;
   padding: 16px;
   width: 100%;
@@ -335,7 +330,7 @@ html {
   top: 0;
 }
 
-.card__img--hover {
+.homepage .card__img--hover {
   transition: 0.2s all ease-out;
   background-size: cover;
   background-position: center;
@@ -348,7 +343,7 @@ html {
   top: 0;
 }
 
-.card {
+.homepage .card {
   margin-right: 25px;
   transition: all .4s cubic-bezier(0.175, 0.885, 0, 1);
   background-color: #fff;
@@ -358,11 +353,11 @@ html {
   box-shadow: 0px 13px 10px -7px rgba(0, 0, 0, 0.1);
 }
 
-.card:hover {
+.homepage .card:hover {
   box-shadow: 0px 30px 18px -8px rgba(0, 0, 0, 0.1);
 }
 
-.card__info {
+.homepage .card__info {
   z-index: 2;
   background-color: #fff;
   border-bottom-left-radius: 12px;
@@ -370,7 +365,7 @@ html {
   padding: 16px 24px 24px 24px;
 }
 
-.card__category {
+.homepage .card__category {
   font-family: 'Raleway', sans-serif;
   text-transform: uppercase;
   font-size: 13px;
@@ -379,34 +374,34 @@ html {
   color: #868686;
 }
 
-.card__title {
+.homepage .card__title {
   margin-top: 5px;
   margin-bottom: 10px;
   font-family: 'Roboto Slab', serif;
 }
 
-.card__by {
+.homepage .card__by {
   font-size: 12px;
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
 }
 
-.card__author {
+.homepage .card__author {
   font-weight: 600;
   text-decoration: none;
   color: #AD7D52;
 }
 
-.card:hover .card__img--hover {
+.homepage .card:hover .card__img--hover {
   height: 100%;
   opacity: 0.3;
 }
 
-.card:hover .card__info {
+.homepage .card:hover .card__info {
   background-color: transparent;
   position: relative;
 }
 
-.card:hover .card__info-hover {
+.homepage .card:hover .card__info-hover {
   opacity: 1;
 }
