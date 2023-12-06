@@ -25,6 +25,7 @@ export default function Inscription() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
+      console.log(userdata);
       const data = await axios.post(
         `http://127.0.0.1:8000/api/user/register/`,
         userdata
@@ -84,7 +85,7 @@ export default function Inscription() {
             <input
               className="signup-input"
               type="text"
-              name="first_name"
+              name="firstname"
               placeholder="Prénom"
               required=""
               onChange={handleChange}
@@ -92,7 +93,7 @@ export default function Inscription() {
             <input
               className="signup-input"
               type="text"
-              name="last_name"
+              name="name"
               placeholder="Nom de famille"
               required=""
               onChange={handleChange}
@@ -100,7 +101,7 @@ export default function Inscription() {
             <input
               className="signup-input"
               type="email"
-              name="email"
+              name="mail"
               placeholder="Adresse e-mail"
               required=""
               onChange={handleChange}
