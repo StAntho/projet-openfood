@@ -1,83 +1,89 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../style/profile.css";
 import Modal from "react-modal";
-import QRCodeModal from "../components/QRCodeModal";
+import AccountModal from "../components/AccountModal";
+import { useUser } from "../components/UserContext";
 
 Modal.setAppElement("#root");
 
-export default function Profile({ setTest }) {
+export default function Profile() {
   const navigate = useNavigate();
-  const [user] = useState(JSON.parse(localStorage.getItem("userInfo")));
-  const [purchaseResume, setPurchaseResume] = useState([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedPurchase, setSelectedPurchase] = useState(null);
+  const { state, dispatch } = useUser();
+  const { userInfo } = state;
+  const [modalAccountIsOpen, setModalAccountIsOpen] = useState(false);
+  // const [modalSubstituteIsOpen, setModalSubstituteIsOpen] = useState(false);
+  // const [selectedPurchase, setSelectedPurchase] = useState(null);
 
-  useEffect(() => {
-    const fetchPurchasesData = async () => {
-      const purchasesResponse = await axios.get(
-        `http://127.0.0.1:8000/purchases/`
-      );
+  // useEffect(() => {
+  //   const fetchPurchasesData = async () => {
+  //     const purchasesResponse = await axios.get(
+  //       `http://127.0.0.1:8000/purchases/`
+  //     );
 
-      const purchases = purchasesResponse.data.filter(
-        (purchase) => purchase.userId === parseInt(user.id)
-      );
+  //     const purchases = purchasesResponse.data.filter(
+  //       (purchase) => purchase.userId === parseInt(user.id)
+  //     );
 
-      const updatedSeances = await Promise.all(
-        purchases.map(async (seance) => {
-          const sessionsResponse = await axios.get(
-            `http://127.0.0.1:8000/sessions/${seance.sessionId}`
-          );
-          const movieResponse = await axios.get(
-            `http://127.0.0.1:8000/movies/${sessionsResponse.data.filmId}`
-          );
+  //     const updatedSeances = await Promise.all(
+  //       purchases.map(async (seance) => {
+  //         const sessionsResponse = await axios.get(
+  //           `http://127.0.0.1:8000/sessions/${seance.sessionId}`
+  //         );
+  //         const movieResponse = await axios.get(
+  //           `http://127.0.0.1:8000/movies/${sessionsResponse.data.filmId}`
+  //         );
 
-          const pricesResponse = await axios.get(
-            `http://127.0.0.1:8000/prices/${seance.priceId}`
-          );
+  //         const pricesResponse = await axios.get(
+  //           `http://127.0.0.1:8000/prices/${seance.priceId}`
+  //         );
 
-          const resume = {
-            purchaseId: seance.id,
-            date: seance.timestamp,
-            movieName: movieResponse.data.name,
-            price: pricesResponse.data.price,
-            priceType: pricesResponse.data.name,
-          };
+  //         const resume = {
+  //           purchaseId: seance.id,
+  //           date: seance.timestamp,
+  //           movieName: movieResponse.data.name,
+  //           price: pricesResponse.data.price,
+  //           priceType: pricesResponse.data.name,
+  //         };
 
-          return {
-            resume,
-          };
-        })
-      );
-      setPurchaseResume(updatedSeances);
-    };
-    fetchPurchasesData();
-  }, [user.id]);
+  //         return {
+  //           resume,
+  //         };
+  //       })
+  //     );
+  //     setPurchaseResume(updatedSeances);
+  //   };
+  //   fetchPurchasesData();
+  // }, [user.id]);
 
-  const openModal = (purchase) => {
-    setSelectedPurchase(purchase.target.id);
-    setModalIsOpen(true);
+  // const openModalSubstitute = () => {
+  //   setModalSubstituteIsOpen(true);
+  // };
+
+  // const closeModalSubstitute = () => {
+  //   setSelectedPurchase(null);
+  //   setModalSubstituteIsOpen(false);
+  // };
+
+  const openModalAccount = () => {
+    setModalAccountIsOpen(true);
   };
 
-  const closeModal = () => {
-    setSelectedPurchase(null);
-    setModalIsOpen(false);
+  const closeModalAccount = () => {
+    setModalAccountIsOpen(false);
   };
 
   const deleteAccount = async () => {
     try {
-      const desac = {
-        is_active: false
-      }
-      await axios.patch(`http://127.0.0.1:8000/users/${user.id}/`, desac, {
+      await axios.delete(`http://127.0.0.1:8000/api/user/delete/${userInfo._id}`, {
         headers: {
-          Authorization: `token ${user.token}`,
+          Authorization: `Bearer ${userInfo.token}`,
         }
       });
 
+      dispatch({ type: "USER_SIGN_OUT" });
       localStorage.removeItem("userInfo");
-      setTest(localStorage.getItem("userInfo"));
       navigate("/");
     } catch (error) {
       console.error(error);
@@ -95,17 +101,20 @@ export default function Profile({ setTest }) {
           />
         </div>
         <div className="profile-nav-info">
-          <h3 className="user-name">{user.username}</h3>
+          <h3 className="user-name">{userInfo.username}</h3>
           <div className="address">
             <p id="state" className="state">
-              {user.first_name}
+              {userInfo.firstname}
             </p>
             <span id="country" className="country">
-              {user.last_name}
+              {userInfo.name}
             </span>
           </div>
         </div>
         <div className="profile-nav-button">
+          <button className="modify-button" onClick={openModalAccount}>
+            Modifier le compte
+          </button>
           <button className="delete-button" onClick={deleteAccount}>
             Supprimer le compte
           </button>
@@ -116,14 +125,14 @@ export default function Profile({ setTest }) {
         <div className="left-side">
           <div className="profile-side">
             <p className="user-mail">
-              <i className="ri-mail-line"></i> {user.email}
+              <i className="ri-mail-line"></i> {userInfo.mail}
             </p>
           </div>
         </div>
         <div className="right-side">
           <div className="nave">
             <ul>
-              <li className="user-review active">Historique de vos achats</li>
+              <li className="user-review active">Listes de vos substituts</li>
             </ul>
           </div>
           <div className="profile-body">
@@ -140,7 +149,7 @@ export default function Profile({ setTest }) {
                 </thead>
 
                 <tbody>
-                  {purchaseResume.map((purchase, index) => (
+                  {/* {purchaseResume.map((purchase, index) => (
                     <tr key={purchase.resume.purchaseId}>
                       <td>{purchase.resume.movieName}</td>
                       <td>{purchase.resume.price.toFixed(2)} €</td>
@@ -165,20 +174,32 @@ export default function Profile({ setTest }) {
                         ></i>
                       </td>
                     </tr>
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
+              {/* <Modal
+                style={{
+                  overlay: {
+                    zIndex: 101,
+                  },
+                }}
+                isOpen={modalSubstituteIsOpen}
+                onRequestClose={closeModalSubstitute}
+                contentLabel="Modification de votre substitut"
+              >
+                <QRCodeModal data={selectedPurchase} closeModal={closeModalSubstitute} />
+              </Modal> */}
               <Modal
                 style={{
                   overlay: {
                     zIndex: 101,
                   },
                 }}
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Modal de QR Code"
+                isOpen={modalAccountIsOpen}
+                onRequestClose={closeModalAccount}
+                contentLabel="Modification de votre compte"
               >
-                <QRCodeModal data={selectedPurchase} closeModal={closeModal} />
+                <AccountModal data={userInfo} closeModal={closeModalAccount} />
               </Modal>
             </div>
           </div>

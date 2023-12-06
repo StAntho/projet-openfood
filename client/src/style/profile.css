@@ -71,9 +71,10 @@ body:has(.account-body) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 9rem 0 0 0;
+  padding: 6.5rem 0 0 0;
 }
 
+.modify-button,
 .delete-button {
   padding: 0.5rem 1rem;
   color: #fff;
@@ -86,6 +87,10 @@ body:has(.account-body) {
   &:hover {
     background-color: #5600b3;
   }
+}
+
+.modify-button {
+  margin-bottom: 0.5rem;
 }
 
 .main-bd {
@@ -136,7 +141,6 @@ body:has(.account-body) {
 .nave ul li {
   padding: 10px;
   width: 100%;
-  cursor: pointer;
   text-align: center;
   transition: all 0.2s ease-in-out;
 
@@ -235,8 +239,14 @@ td:has(i.ri-qr-code-line) {
 
   .profile-nav-button {
     position: unset;
-    display: block;
     padding: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+
+  .modify-button {
+    margin: 0;
   }
 
   .main-bd {
