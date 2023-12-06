@@ -41,7 +41,7 @@ export default function Header() {
                   isActive ? "nav__link active-link" : "nav__link"
                 }
               >
-                <i className="ri-coupon-2-line"></i> Produits
+                <i className="ri-restaurant-line"></i> Produits
               </NavLink>
             </li>
             {userInfo && userInfo !== null && (
