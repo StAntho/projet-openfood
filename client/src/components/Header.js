@@ -62,7 +62,6 @@ export default function Header() {
                 <NavLink
                   onClick={closeMenu}
                   to="/admin"
-                  target="_blank"
                   className="nav__link"
                 >
                   <i className="ri-settings-2-line"></i> Administration
