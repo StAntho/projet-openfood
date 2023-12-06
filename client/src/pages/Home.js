@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import "../style/Home.css";
 import Card from '../components/Card';
+import { useUser } from "../components/UserContext";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const { state, dispatch } = useUser();
+  const { userInfo } = state;
   const [selectCat, setSelectCat] = useState();
   const [searchText, setSearchText] = useState('');
   const [products, setProducts] = useState([]);
   const [productsReplace, setProductsReplace] = useState([]);
   const [onLoad, setOnLoad] = useState(0);
+  const [toReplace, setToReplace] = useState(null);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [])
 
   const categories = {
     "Plant-based foods and beverages": "Aliments et boissons à base de végétaux",
@@ -47,8 +56,23 @@ export default function Home() {
     }
   }
 
-  const handleSubstitute = async (e) => {
-    console.log("fonction de substitute");
+  const handleSubstitute = async (code) => {
+    if (userInfo) {
+      try {
+        let data = {
+          userId: userInfo._id,
+          productId: toReplace,
+          substituteId: code.code
+        }
+        const response = await axios.patch('http://127.0.0.1:8000/api/substitute/set', data, { headers: { Authorization: `Bearer ${userInfo.token}` } });
+        dispatch({ type: "USER_SIGNIN", payload: response.data });
+        localStorage.setItem("userInfo", JSON.stringify(response.data));
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate('/inscription');
+    }
   }
 
   const handleSearchChange = async (e) => {
@@ -98,8 +122,9 @@ export default function Home() {
     }
     try {
       setOnLoad(1);
-      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=product_name_fr,selected_images`);
+      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images`);
       setOnLoad(0);
+      setToReplace(code.code)
       setProductsReplace(productsData.data.products);
     } catch (error) {
       setOnLoad(0);
@@ -128,7 +153,7 @@ export default function Home() {
         </select>
         <input
           type="text"
-          placeholder="Recherche par QR Code..."
+          placeholder="Recherche par code barre..."
           value={searchText}
           onChange={handleSearchChange}
         />
@@ -137,10 +162,10 @@ export default function Home() {
             productsReplace.length > 0 ? (
               <>
                 <h2>Produits similaires</h2>
-                <button className='retour-btn' onClick={(e) => { setProductsReplace([]); }}>Retour à la liste des catégories</button>
+                <button className='retour-btn' onClick={(e) => { setProductsReplace([]); setToReplace(null) }}>Retour à la liste des catégories</button>
                 <div className='grid'>
                   {productsReplace.map((product, index) => (
-                    <Card data={product} handleChange={handleSubstitute} />
+                    <Card data={product} handleChange={handleSubstitute} type={0} />
                   ))}
                 </div>
               </>
@@ -149,7 +174,7 @@ export default function Home() {
                 <h2>Produits de la catégorie</h2>
                 <div className='grid'>
                   {products.map((product, index) => (
-                    <Card data={product} handleChange={handleToReplace} />
+                    <Card data={product} handleChange={handleToReplace} type={1} />
                   ))}
                 </div>
               </>

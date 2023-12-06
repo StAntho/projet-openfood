@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../style/Card.css";
 
-export default function Card({ data, handleChange }) {
+export default function Card({ data, handleChange, type }) {
 
     return (
         <div className="card">
@@ -15,7 +15,7 @@ export default function Card({ data, handleChange }) {
             </div>
             <ul className="sci">
                 <li>
-                    <button onClick={() => handleChange(data)}>Voir les substitut</button>
+                    <button onClick={() => handleChange(data)}>{type == 1 ? 'Voir les substitut' : 'Choisir ce substitut'}</button>
                 </li>
             </ul>
         </div>
