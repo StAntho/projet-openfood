@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Inscription from "./pages/Inscription";
+import Dashboard from "./pages/Dashboard";
 // import Seance from "./pages/Seance";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <Routes>
           <Route path="" element={<Home />} />
           <Route path="/inscription" element={<Inscription />} />
+          <Route path="/admin" element={<Dashboard />} />
           {/* <Route path="/account" element={<Profile />} /> */}
           {/* <Route path="/seance/:id" element={<Seance />} /> */}
         </Routes>

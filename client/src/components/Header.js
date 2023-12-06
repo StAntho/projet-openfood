@@ -61,7 +61,7 @@ export default function Header() {
               <li className="nav__item">
                 <NavLink
                   onClick={closeMenu}
-                  to="http://localhost:8000/admin"
+                  to="/admin"
                   target="_blank"
                   className="nav__link"
                 >
