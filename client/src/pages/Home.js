@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import "../style/Home.css";
+import Card from '../components/Card';
 
 export default function Home() {
   const [selectCat, setSelectCat] = useState();
@@ -46,15 +47,39 @@ export default function Home() {
     }
   }
 
+  const handleSubstitute = async (e) => {
+    console.log("fonction de substitute");
+  }
+
   const handleSearchChange = async (e) => {
+    setProductsReplace([]);
+    setProducts([]);
     const searchText = e.target.value;
     setSearchText(searchText);
     if (searchText.length > 0) {
       try {
         const response = await axios.get(`https://world.openfoodfacts.net/api/v2/search?code=${searchText}`);
-        setProducts(response.data.products)
+        console.log(response.data.products);
+        setProducts(response.data.products.filter((product) => product.code !== ""))
       } catch (error) {
         console.error(error);
+      }
+    } else {
+      if (selectCat !== "") {
+        try {
+          setOnLoad(1);
+          const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?categories_tags=${selectCat}&countries_tags_en=France&origins_tags=france&purchase_places_tags=france&fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
+          setOnLoad(0);
+          const finalProducts = productsData.data.products.filter((product) => product.product_name_fr && product.product_name_fr !== "");
+          setProducts(finalProducts)
+        } catch (error) {
+          setOnLoad(0);
+          console.log(error);
+        }
+      } else {
+        setProducts([]);
+        setProductsReplace([]);
+        setSearchText('')
       }
     }
   };
@@ -75,7 +100,7 @@ export default function Home() {
       setOnLoad(1);
       const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=product_name_fr,selected_images`);
       setOnLoad(0);
-      setProductsReplace(productsData.data.products)
+      setProductsReplace(productsData.data.products);
     } catch (error) {
       setOnLoad(0);
       console.log(error);
@@ -103,11 +128,11 @@ export default function Home() {
         </select>
         <input
           type="text"
-          placeholder="Recherche par nom..."
+          placeholder="Recherche par QR Code..."
           value={searchText}
           onChange={handleSearchChange}
         />
-        <section className="cards" >
+        <div className="container" >
           {
             productsReplace.length > 0 ? (
               <>
@@ -115,20 +140,7 @@ export default function Home() {
                 <button className='retour-btn' onClick={(e) => { setProductsReplace([]); }}>Retour à la liste des catégories</button>
                 <div className='grid'>
                   {productsReplace.map((product, index) => (
-                    <article key={index} className="card">
-                      <div className="card__info-hover">
-                      </div>
-                      <div className="card__img"></div>
-                      <a href="#" className="card_link">
-                        <div style={{
-                          backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
-                        }} className="card__img--hover"></div>
-                      </a>
-                      <div className="card__info">
-                        <h3 className="card__title">{product.product_name_fr}</h3>
-                        <button onClick={() => console.log('fonction substitut')}>Définir substitut</button>
-                      </div>
-                    </article>
+                    <Card data={product} handleChange={handleSubstitute} />
                   ))}
                 </div>
               </>
@@ -137,20 +149,7 @@ export default function Home() {
                 <h2>Produits de la catégorie</h2>
                 <div className='grid'>
                   {products.map((product, index) => (
-                    <article key={index} className="card">
-                      <div className="card__info-hover">
-                      </div>
-                      <div className="card__img"></div>
-                      <a href="#" className="card_link">
-                        <div style={{
-                          backgroundImage: `url('${product.selected_images?.front?.display?.fr}')`
-                        }} className="card__img--hover"></div>
-                      </a>
-                      <div className="card__info">
-                        <h3 className="card__title">{product.product_name_fr}</h3>
-                        <button onClick={() => handleToReplace(product)}>Voir similaires</button>
-                      </div>
-                    </article>
+                    <Card data={product} handleChange={handleToReplace} />
                   ))}
                 </div>
               </>
@@ -158,7 +157,7 @@ export default function Home() {
               <p>Aucun produit trouvé.</p>
             )
           }
-        </section>
+        </div>
       </div>
     </span>
   )
