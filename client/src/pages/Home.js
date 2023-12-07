@@ -212,7 +212,8 @@ export default function Home() {
                 <button className='retour-btn' onClick={(e) => { setProductsReplace([]); setToReplace(null) }}>Retour à la liste des catégories</button>
                 <div className='grid'>
                   {productsReplace.map((product, index) => (
-                    <Card data={product} handleChange={handleSubstitute} type={0} />
+                    product?.selected_images?.front?.display?.fr ?
+                      <Card data={product} handleChange={handleSubstitute} type={0} /> : null
                   ))}
                 </div>
               </>
@@ -221,7 +222,8 @@ export default function Home() {
                 <h2>Produits de la catégorie</h2>
                 <div className='grid'>
                   {products.map((product, index) => (
-                    <Card data={product} handleChange={handleToReplace} type={1} />
+                    product?.selected_images?.front?.display?.fr ?
+                      <Card data={product} handleChange={handleToReplace} type={1} /> : null
                   ))}
                 </div>
               </>

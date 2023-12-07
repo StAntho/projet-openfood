@@ -7,6 +7,17 @@
   grid-row-gap: 20px;
 }
 
+@media screen and (max-width: 1200px) {
+  .homepage .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .homepage .grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 .homepage .grid p {
   aspect-ratio: 1/1;
