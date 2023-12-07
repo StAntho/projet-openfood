@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
 export default function BarChart({ nombre, produits, title }) {
-  console.log(nombre);
-  console.log(produits);
   const chartContainer = useRef(null);
   let barChart = null;
 
@@ -11,18 +9,13 @@ export default function BarChart({ nombre, produits, title }) {
   const code = [];
   const nb = [];
 
-  {
-    Object.keys(produits).map(
-      (key) => (
-        labs.push(produits[key].product_name_fr), code.push(produits[key].id)
-      )
-    );
-  }
+  Object.keys(produits).map(
+    (key) => (
+      labs.push(produits[key].product_name_fr), code.push(produits[key].id)
+    )
+  );
   code.map((key) => nb.push(nombre[key]));
 
-  console.log(labs);
-  console.log(code);
-  console.log(nb);
   useEffect(() => {
     const data = {
       labels: labs,

@@ -115,7 +115,9 @@ export default function Dashboard() {
       } else {
         nbsearch[s] = 1;
       }
+      return "";
     });
+    return "";
   });
 
   return (

@@ -36,9 +36,9 @@ export default function Home() {
           setOnLoad(1);
           const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags&page_size=100`);
           const filteredProducts = productsData.data.products.filter(product =>
-            !product.allergens_tags.some(allergen => userInfo.allergen.includes(allergen))
+            !product.allergens_tags.some(allergen => userInfo?.allergen?.includes(allergen))
           );
-          if (filteredProducts.length == 0) {
+          if (filteredProducts.length === 0) {
             toast.error("Vous n'avons trouvé aucun substitut qui correspondent à vos filtres");
           }
           setOnLoad(0);
@@ -52,8 +52,7 @@ export default function Home() {
     if (location.state && location.state.code) {
       fetchData();
     }
-
-  }, [location]);
+  }, [location, userInfo]);
 
   const categories = {
     "Plant-based foods and beverages": "Aliments et boissons à base de végétaux",
@@ -123,7 +122,6 @@ export default function Home() {
     if (searchText.length > 0) {
       try {
         const response = await axios.get(`https://world.openfoodfacts.net/api/v2/search?code=${searchText}`);
-        console.log(response.data.products);
         setProducts(response.data.products.filter((product) => product.code !== ""))
       } catch (error) {
         console.error(error);
@@ -165,9 +163,9 @@ export default function Home() {
       setOnLoad(1);
       const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags&page_size=100`);
       const filteredProducts = productsData.data.products.filter(product =>
-        !product.allergens_tags.some(allergen => userInfo.allergen.includes(allergen))
+        !product.allergens_tags.some(allergen => userInfo?.allergen?.includes(allergen))
       );
-      if (filteredProducts.length == 0) {
+      if (filteredProducts.length === 0) {
         toast.error("Vous n'avons trouvé aucun substitut qui correspondent à vos filtres");
       }
       setOnLoad(0);
@@ -195,7 +193,7 @@ export default function Home() {
         <select value={selectCat} onChange={handleCatChange}>
           <option value="">-- Choisissez votre catégorie --</option>
           {Object.entries(categories).map(([key, value]) => (
-            <option selected={key == selectCat} key={key} value={key}>{value}</option>
+            <option key={key} value={key}>{value}</option>
           ))}
         </select>
         <input
@@ -213,7 +211,7 @@ export default function Home() {
                 <div className='grid'>
                   {productsReplace.map((product, index) => (
                     product?.selected_images?.front?.display?.fr ?
-                      <Card data={product} handleChange={handleSubstitute} type={0} /> : null
+                      <Card key={index} data={product} handleChange={handleSubstitute} type={0} /> : null
                   ))}
                 </div>
               </>
@@ -223,7 +221,7 @@ export default function Home() {
                 <div className='grid'>
                   {products.map((product, index) => (
                     product?.selected_images?.front?.display?.fr ?
-                      <Card data={product} handleChange={handleToReplace} type={1} /> : null
+                      <Card key={index} data={product} handleChange={handleToReplace} type={1} /> : null
                   ))}
                 </div>
               </>

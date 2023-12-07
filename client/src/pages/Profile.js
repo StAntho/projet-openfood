@@ -86,7 +86,6 @@ export default function Profile() {
             const substitutProduct = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${substitut}?fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
             setProductsData((values) => ({ ...values, [substitut]: substitutProduct.data.product }));
           } catch (error) {
-            toast.error(getErrorFromBackend(error));
           }
           return "";
         })
@@ -188,7 +187,7 @@ export default function Profile() {
             </ul>
           </div>
           <div className="profile-body">
-            <div className="profile-reviews tab container">
+            <div className="profile-reviews tab container allergen">
               <form onSubmit={handleSelectChange}>
                 <select onChange={(e) => setTextAllergen(e.target.value)}>
                   <option value=''>Choisissez votre allergène</option>
@@ -196,12 +195,12 @@ export default function Profile() {
                     <option key={key} value={key}>{allergens[key]?.name?.fr}</option>
                   ))}
                 </select>
-                <input type='submit' />
+                <button><i className="ri-send-plane-2-line"></i> Envoyer</button>
               </form>
               {
                 userInfo?.allergen?.map((allergen) => (
                   allergens[allergen] ?
-                    <p>{allergens[allergen].name.fr} <button onClick={() => handleDeleteAllergen(allergen)}>Delete</button></p>
+                    <p key={allergen}>{allergens[allergen].name.fr} <button onClick={() => handleDeleteAllergen(allergen)}><i className="ri-close-circle-line"></i></button></p>
                     : null
                 ))
               }

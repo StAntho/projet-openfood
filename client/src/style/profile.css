@@ -115,6 +115,28 @@ body:has(.account-body) {
   }
 }
 
+.allergen button {
+  padding: 0.5rem 0.5rem;
+  color: #fff;
+  background-color: #7b00ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #5600b3;
+  }
+}
+
+.allergen button:first-of-type {
+  margin-left: 1rem;
+}
+
+.allergen p {
+  margin: 0.5rem 0;
+}
+
 .main-bd {
   width: 100%;
   display: flex;
@@ -297,6 +319,7 @@ td:has(i.ri-qr-code-line) {
   align-items: center;
   flex-wrap: wrap;
   max-width: none;
+  margin-inline: unset;
 }
 
 .account-body .grid {
