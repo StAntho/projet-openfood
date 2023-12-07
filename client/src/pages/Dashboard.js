@@ -5,6 +5,7 @@ import { getErrorFromBackend } from "./../utils";
 import { useUser } from "../components/UserContext";
 import { toast } from "react-toastify";
 import ChartPie from "../components/ChartPie";
+import BarChart from "../components/BarChart";
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
@@ -61,16 +62,13 @@ export default function Dashboard() {
     });
   }, [usersProducts]);
 
-  console.log(usersProducts);
   const nbsubstitut = [];
   const nbsearch = [];
   Object.keys(usersProducts).map((user) => {
-    // console.log(user);
     if (usersProducts[user] === undefined) {
       return "";
     }
     Object.keys(usersProducts[user]).map((product) => {
-      console.log(product);
       const s = product;
       const id = usersProducts[user][product];
       if (nbsubstitut[id]) {
@@ -86,9 +84,6 @@ export default function Dashboard() {
     });
   });
 
-  console.log(nbsearch);
-  // console.log(search);
-  // console.log(substitute);
   return (
     <div>
       <h1 className="titleDashboard">Tableau de bord</h1>
@@ -177,7 +172,17 @@ export default function Dashboard() {
         </tbody>
       </table>
 
-      <ChartPie plat={26} dessert={32} />
+      {/* <ChartPie plat={26} dessert={32} /> */}
+      <BarChart
+        nombre={nbsearch}
+        produits={search}
+        title={"Graphique des produits recherchés"}
+      />
+      <BarChart
+        nombre={nbsubstitut}
+        produits={substitute}
+        title={"Graphique des produits substituts"}
+      />
     </div>
   );
 }
