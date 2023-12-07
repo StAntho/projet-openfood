@@ -5,6 +5,7 @@ import "../style/profile.css";
 import Modal from "react-modal";
 import AccountModal from "../components/AccountModal";
 import { useUser } from "../components/UserContext";
+import { toast } from "react-toastify";
 
 Modal.setAppElement("#root");
 
@@ -20,8 +21,11 @@ export default function Profile() {
     const fetchData = async () => {
       try {
         let response = await axios.get('https://world.openfoodfacts.org/data/taxonomies/allergens.json');
-        setAllergens(response.data);
-        console.log(response.data);
+        const finalData = { ...response.data };
+        if (finalData['en:none']) {
+          delete finalData['en:none'];
+        }
+        setAllergens(finalData);
       } catch (error) {
         console.log(error);
       }
@@ -32,10 +36,29 @@ export default function Profile() {
 
   const handleSelectChange = async (e) => {
     e.preventDefault();
+    if (!userInfo.allergen.includes(textAllergen)) {
+      try {
+        const data = await axios.patch(
+          `http://localhost:8000/api/user/update/${userInfo._id}`,
+          { allergen: [...userInfo.allergen, textAllergen] },
+          { headers: { Authorization: `Bearer ${userInfo.token}` } }
+        );
+        dispatch({ type: "USER_SIGNIN", payload: data.data });
+        localStorage.setItem("userInfo", JSON.stringify(data.data));
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      toast.error('Cet allergène est déjà enregistré')
+    }
+  }
+
+  const handleDeleteAllergen = async (allergenDel) => {
     try {
+      const filteredAllergen = userInfo.allergen.filter(allergen => allergenDel !== allergen);
       const data = await axios.patch(
         `http://localhost:8000/api/user/update/${userInfo._id}`,
-        { allergen: [...userInfo.allergen, textAllergen] },
+        { allergen: filteredAllergen },
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({ type: "USER_SIGNIN", payload: data.data });
@@ -252,9 +275,14 @@ export default function Profile() {
                 </select>
                 <input type='submit' />
               </form>
-              {userInfo?.allergen?.map((allergen) => (
-                <p>{allergens[allergen].name.fr}</p>
-              ))}
+              {
+                userInfo?.allergen?.map((allergen) => (
+                  allergens[allergen] ?
+                    <p>{allergens[allergen].name.fr} <button onClick={() => handleDeleteAllergen(allergen)}>Delete</button></p>
+                    : null
+                ))
+              }
+
             </div>
           </div>
         </div>

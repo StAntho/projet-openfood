@@ -4,6 +4,7 @@ import axios from 'axios';
 import "../style/Home.css";
 import Card from '../components/Card';
 import { useUser } from "../components/UserContext";
+import { toast } from "react-toastify";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -120,12 +121,19 @@ export default function Home() {
         string += ','
       }
     }
+
     try {
       setOnLoad(1);
-      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images`);
+      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags`);
+      const filteredProducts = productsData.data.products.filter(product =>
+        !product.allergens_tags.some(allergen => userInfo.allergen.includes(allergen))
+      );
+      if (filteredProducts.length == 0) {
+        toast.error("Vous n'avons trouvé aucun substitut qui correspondent à vos filtres");
+      }
       setOnLoad(0);
-      setToReplace(code.code)
-      setProductsReplace(productsData.data.products);
+      setToReplace(code.code);
+      setProductsReplace(filteredProducts);
     } catch (error) {
       setOnLoad(0);
       console.log(error);
