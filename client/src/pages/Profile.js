@@ -1,11 +1,13 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios, { all } from "axios";
+import axios from "axios";
 import "../style/profile.css";
 import Modal from "react-modal";
 import AccountModal from "../components/AccountModal";
 import { useUser } from "../components/UserContext";
 import { toast } from "react-toastify";
+import { getErrorFromBackend } from "../utils";
+import Card from '../components/Card';
 
 Modal.setAppElement("#root");
 
@@ -13,9 +15,11 @@ export default function Profile() {
   const navigate = useNavigate();
   const { state, dispatch } = useUser();
   const { userInfo } = state;
-  const [modalAccountIsOpen, setModalAccountIsOpen] = useState(false);
   const [allergens, setAllergens] = useState([]);
   const [textAllergen, setTextAllergen] = useState('');
+  const [substituts, setSubstituts] = useState({});
+  const [productsData, setProductsData] = useState({});
+  const [modalAccountIsOpen, setModalAccountIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +31,7 @@ export default function Profile() {
         }
         setAllergens(finalData);
       } catch (error) {
-        console.log(error);
+        toast.error(getErrorFromBackend(error));
       }
     };
 
@@ -51,7 +55,7 @@ export default function Profile() {
     } else {
       toast.error('Cet allergène est déjà enregistré')
     }
-  }
+  };
 
   const handleDeleteAllergen = async (allergenDel) => {
     try {
@@ -66,60 +70,32 @@ export default function Profile() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-  // const [modalSubstituteIsOpen, setModalSubstituteIsOpen] = useState(false);
-  // const [selectedPurchase, setSelectedPurchase] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchPurchasesData = async () => {
-  //     const purchasesResponse = await axios.get(
-  //       `http://127.0.0.1:8000/purchases/`
-  //     );
-
-  //     const purchases = purchasesResponse.data.filter(
-  //       (purchase) => purchase.userId === parseInt(user.id)
-  //     );
-
-  //     const updatedSeances = await Promise.all(
-  //       purchases.map(async (seance) => {
-  //         const sessionsResponse = await axios.get(
-  //           `http://127.0.0.1:8000/sessions/${seance.sessionId}`
-  //         );
-  //         const movieResponse = await axios.get(
-  //           `http://127.0.0.1:8000/movies/${sessionsResponse.data.filmId}`
-  //         );
-
-  //         const pricesResponse = await axios.get(
-  //           `http://127.0.0.1:8000/prices/${seance.priceId}`
-  //         );
-
-  //         const resume = {
-  //           purchaseId: seance.id,
-  //           date: seance.timestamp,
-  //           movieName: movieResponse.data.name,
-  //           price: pricesResponse.data.price,
-  //           priceType: pricesResponse.data.name,
-  //         };
-
-  //         return {
-  //           resume,
-  //         };
-  //       })
-  //     );
-  //     setPurchaseResume(updatedSeances);
-  //   };
-  //   fetchPurchasesData();
-  // }, [user.id]);
-
-  // const openModalSubstitute = () => {
-  //   setModalSubstituteIsOpen(true);
-  // };
-
-  // const closeModalSubstitute = () => {
-  //   setSelectedPurchase(null);
-  //   setModalSubstituteIsOpen(false);
-  // };
+  useEffect(() => {
+    const fetchSubstituteData = async () => {
+      try {
+        const substituts = await axios.get(`http://localhost:8000/api/substitute/${userInfo._id}`,
+          { headers: { Authorization: `Bearer ${userInfo.token}` } }
+        );
+        setSubstituts(substituts.data);
+        Object.entries(substituts.data).map(async ([key, substitut]) => {
+          try {
+            const initialProduct = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${key}?fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
+            setProductsData((values) => ({ ...values, [key]: initialProduct.data.product }));
+            const substitutProduct = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${substitut}?fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
+            setProductsData((values) => ({ ...values, [substitut]: substitutProduct.data.product }));
+          } catch (error) {
+            toast.error(getErrorFromBackend(error));
+          }
+          return "";
+        })
+      } catch (error) {
+        toast.error(getErrorFromBackend(error));
+      }
+    };
+    fetchSubstituteData();
+  }, [userInfo]);
 
   const openModalAccount = () => {
     setModalAccountIsOpen(true);
@@ -141,7 +117,30 @@ export default function Profile() {
       localStorage.removeItem("userInfo");
       navigate("/");
     } catch (error) {
-      console.error(error);
+      toast.error(getErrorFromBackend(error));
+    }
+  };
+
+  const modifySubstitute = async (e) => {
+    e.preventDefault();
+    const value = e.target.value;
+    toast.info(`En cours de modification ${value}`);
+  };
+
+  const deleteSubstitute = async (e) => {
+    e.preventDefault();
+    const value = e.target.value;
+    try {
+      const data = await axios.patch(`http://localhost:8000/api/substitute/delete`, {
+        userId: userInfo._id,
+        productId: value
+      }, {
+        headers: { Authorization: `Bearer ${userInfo.token}` }
+      });
+      dispatch({ type: "USER_SIGNIN", payload: data.data });
+      localStorage.setItem("userInfo", JSON.stringify(data.data));
+    } catch (error) {
+      toast.error(getErrorFromBackend(error));
     }
   };
 
@@ -165,6 +164,11 @@ export default function Profile() {
               {userInfo.name}
             </span>
           </div>
+          <div className="address">
+            <span id="country" className="country">
+              <i className="ri-mail-line"></i> {userInfo.mail}
+            </span>
+          </div>
         </div>
         <div className="profile-nav-button">
           <button className="modify-button" onClick={openModalAccount}>
@@ -177,74 +181,53 @@ export default function Profile() {
       </div>
 
       <div className="main-bd">
-        <div className="left-side">
-          <div className="profile-side">
-            <p className="user-mail">
-              <i className="ri-mail-line"></i> {userInfo.mail}
-            </p>
-          </div>
-        </div>
         <div className="right-side">
+          <div className="nave">
+            <ul>
+              <li className="user-review active">Configurer vos alergies</li>
+            </ul>
+          </div>
+          <div className="profile-body">
+            <div className="profile-reviews tab container">
+              <form onSubmit={handleSelectChange}>
+                <select onChange={(e) => setTextAllergen(e.target.value)}>
+                  <option value=''>Choisissez votre allergène</option>
+                  {Object.keys(allergens).map(key => (
+                    <option key={key} value={key}>{allergens[key]?.name?.fr}</option>
+                  ))}
+                </select>
+                <input type='submit' />
+              </form>
+              {
+                userInfo?.allergen?.map((allergen) => (
+                  allergens[allergen] ?
+                    <p>{allergens[allergen].name.fr} <button onClick={() => handleDeleteAllergen(allergen)}>Delete</button></p>
+                    : null
+                ))
+              }
+            </div>
+          </div>
           <div className="nave">
             <ul>
               <li className="user-review active">Listes de vos substituts</li>
             </ul>
           </div>
           <div className="profile-body">
-            <div className="profile-reviews tab">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Films</th>
-                    <th>Prix</th>
-                    <th>Forfait</th>
-                    <th>Date</th>
-                    <th>Voir le QR Code</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {/* {purchaseResume.map((purchase, index) => (
-                    <tr key={purchase.resume.purchaseId}>
-                      <td>{purchase.resume.movieName}</td>
-                      <td>{purchase.resume.price.toFixed(2)} €</td>
-                      <td>{purchase.resume.priceType}</td>
-                      <td>
-                        {new Date(purchase.resume.date).toLocaleString(
-                          "fr-FR",
-                          {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
-                      </td>
-
-                      <td id={purchase.resume.purchaseId} onClick={openModal}>
-                        <i
-                          id={purchase.resume.purchaseId}
-                          className="ri-qr-code-line"
-                        ></i>
-                      </td>
-                    </tr>
-                  ))} */}
-                </tbody>
-              </table>
-
-              {/* <Modal
-                style={{
-                  overlay: {
-                    zIndex: 101,
-                  },
-                }}
-                isOpen={modalSubstituteIsOpen}
-                onRequestClose={closeModalSubstitute}
-                contentLabel="Modification de votre substitut"
-              >
-                <QRCodeModal data={selectedPurchase} closeModal={closeModalSubstitute} />
-              </Modal> */}
+            <div className="profile-reviews tab container">
+              {Object.entries(substituts).map(([key, substitut]) => (
+                <div key={key} className="grid">
+                  <Card data={productsData[key]} type="initial" />
+                  <div className="subtitut-nav-button">
+                    <button className="modify-button" value={key} onClick={modifySubstitute}>
+                      Modifier le substitut
+                    </button>
+                    <button className="delete-button" value={key} onClick={deleteSubstitute}>
+                      Supprimer le substitut
+                    </button>
+                  </div>
+                  <Card data={productsData[substitut]} type="substitute" />
+                </div>
+              ))}
               <Modal
                 style={{
                   overlay: {
@@ -257,32 +240,6 @@ export default function Profile() {
               >
                 <AccountModal data={userInfo} closeModal={closeModalAccount} />
               </Modal>
-            </div>
-          </div>
-          <div className="nave">
-            <ul>
-              <li className="user-review active">Configurer vos alergies</li>
-            </ul>
-          </div>
-          <div className="profile-body">
-            <div className="profile-reviews tab">
-              <form onSubmit={handleSelectChange}>
-                <select onChange={(e) => setTextAllergen(e.target.value)}>
-                  <option value=''>Choisissez votre allergène</option>
-                  {Object.keys(allergens).map(key => (
-                    <option selected={textAllergen == key} key={key} value={key}>{allergens[key]?.name?.fr}</option>
-                  ))}
-                </select>
-                <input type='submit' />
-              </form>
-              {
-                userInfo?.allergen?.map((allergen) => (
-                  allergens[allergen] ?
-                    <p>{allergens[allergen].name.fr} <button onClick={() => handleDeleteAllergen(allergen)}>Delete</button></p>
-                    : null
-                ))
-              }
-
             </div>
           </div>
         </div>

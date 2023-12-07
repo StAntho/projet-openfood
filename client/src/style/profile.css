@@ -74,8 +74,8 @@ body:has(.account-body) {
   padding: 6.5rem 0 0 0;
 }
 
-.modify-button,
-.delete-button {
+.profile-nav-button .modify-button,
+.profile-nav-button .delete-button {
   padding: 0.5rem 1rem;
   color: #fff;
   background-color: #7b00ff;
@@ -89,14 +89,36 @@ body:has(.account-body) {
   }
 }
 
-.modify-button {
+.profile-nav-button .modify-button {
   margin-bottom: 0.5rem;
+}
+
+.subtitut-nav-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.subtitut-nav-button .modify-button,
+.subtitut-nav-button .delete-button {
+  padding: 0.5rem 1rem;
+  color: #fff;
+  background-color: #7b00ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #5600b3;
+  }
 }
 
 .main-bd {
   width: 100%;
   display: flex;
-  padding-right: 15px;
+  flex-direction: column;
 }
 
 .profile-side {
@@ -118,10 +140,6 @@ body:has(.account-body) {
 .profile-side p i {
   color: #e40046;
   margin-right: 10px;
-}
-
-.right-side {
-  width: calc(100dvw - 310px - 100px);
 }
 
 .nave {
@@ -268,4 +286,53 @@ td:has(i.ri-qr-code-line) {
   .profile-nav-info .address {
     justify-content: center;
   }
+}
+
+.account-body .container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: none;
+}
+
+.account-body .grid {
+  margin-left: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+}
+
+.account-body .grid p {
+  aspect-ratio: 1/1;
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-body .grid p a {
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.account-body .grid p:hover {
+  transform: scale(1.1);
+  transition: transform 0.5s ease;
 }
