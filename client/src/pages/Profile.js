@@ -50,7 +50,7 @@ export default function Profile() {
         dispatch({ type: "USER_SIGNIN", payload: data.data });
         localStorage.setItem("userInfo", JSON.stringify(data.data));
       } catch (error) {
-        console.log(error);
+        toast.error(getErrorFromBackend(error));
       }
     } else {
       toast.error('Cet allergène est déjà enregistré')
@@ -68,7 +68,7 @@ export default function Profile() {
       dispatch({ type: "USER_SIGNIN", payload: data.data });
       localStorage.setItem("userInfo", JSON.stringify(data.data));
     } catch (error) {
-      console.log(error);
+      toast.error(getErrorFromBackend(error));
     }
   };
 

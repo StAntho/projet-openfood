@@ -25,7 +25,6 @@ export default function Inscription() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      console.log(userdata);
       const data = await axios.post(
         `http://127.0.0.1:8000/api/user/register/`,
         userdata

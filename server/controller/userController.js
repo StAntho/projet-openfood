@@ -138,7 +138,6 @@ export default {
         allergen: updatedUser.allergen
       });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ message: "Internal server error" });
     }
   },
