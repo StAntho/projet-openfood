@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import "../style/Home.css";
 import Card from '../components/Card';
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 export default function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { state, dispatch } = useUser();
   const { userInfo } = state;
   const [selectCat, setSelectCat] = useState();
@@ -18,8 +19,41 @@ export default function Home() {
   const [toReplace, setToReplace] = useState(null);
 
   useEffect(() => {
-    console.log(userInfo);
-  }, [])
+    const fetchData = async () => {
+      try {
+        let response = await axios.get(`https://world.openfoodfacts.net/api/v2/product/${location.state.code}?fields=categories_tags`);
+        if (response?.data?.product?.categories_tags) {
+          let string = "";
+          for (let index = 0; index < response?.data?.product?.categories_tags.length; index++) {
+            if (index > 2) {
+              break;
+            }
+            string += response?.data?.product?.categories_tags[index].split(':')[1]
+            if ((index + 1) !== response?.data?.product?.categories_tags.length && (index + 1) < 3) {
+              string += ','
+            }
+          }
+          setOnLoad(1);
+          const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags&page_size=100`);
+          const filteredProducts = productsData.data.products.filter(product =>
+            !product.allergens_tags.some(allergen => userInfo.allergen.includes(allergen))
+          );
+          if (filteredProducts.length == 0) {
+            toast.error("Vous n'avons trouvé aucun substitut qui correspondent à vos filtres");
+          }
+          setOnLoad(0);
+          setToReplace(location.state.code);
+          setProductsReplace(filteredProducts);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (location.state && location.state.code) {
+      fetchData();
+    }
+
+  }, [location]);
 
   const categories = {
     "Plant-based foods and beverages": "Aliments et boissons à base de végétaux",
@@ -42,7 +76,7 @@ export default function Home() {
     if (e.target.value !== "") {
       try {
         setOnLoad(1);
-        const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?categories_tags=${e.target.value}&countries_tags_en=France&origins_tags=france&purchase_places_tags=france&fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
+        const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?categories_tags=${e.target.value}&countries_tags_en=France&origins_tags=france&purchase_places_tags=france&fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name&page_size=100`);
         setOnLoad(0);
         const finalProducts = productsData.data.products.filter((product) => product.product_name_fr && product.product_name_fr !== "");
         setProducts(finalProducts)
@@ -68,6 +102,7 @@ export default function Home() {
         const response = await axios.patch('http://127.0.0.1:8000/api/substitute/set', data, { headers: { Authorization: `Bearer ${userInfo.token}` } });
         dispatch({ type: "USER_SIGNIN", payload: response.data });
         localStorage.setItem("userInfo", JSON.stringify(response.data));
+        toast.success('Votre substitut a bien été enregistré');
       } catch (error) {
         console.log(error);
       }
@@ -93,7 +128,7 @@ export default function Home() {
       if (selectCat !== "") {
         try {
           setOnLoad(1);
-          const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?categories_tags=${selectCat}&countries_tags_en=France&origins_tags=france&purchase_places_tags=france&fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name`);
+          const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?categories_tags=${selectCat}&countries_tags_en=France&origins_tags=france&purchase_places_tags=france&fields=code,product_name_fr,stores,selected_images,link,categories_tags,brands_tags&sort_by=product_name&page_size=100`);
           setOnLoad(0);
           const finalProducts = productsData.data.products.filter((product) => product.product_name_fr && product.product_name_fr !== "");
           setProducts(finalProducts)
@@ -124,7 +159,7 @@ export default function Home() {
 
     try {
       setOnLoad(1);
-      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags`);
+      const productsData = await axios.get(`https://world.openfoodfacts.net/api/v2/search?countries_tags_en=France&origins_tags=france&purchase_places_tags=france&nutrition_grades_tags=a&categories_tags=${string}&fields=code,product_name_fr,selected_images,allergens_tags&page_size=100`);
       const filteredProducts = productsData.data.products.filter(product =>
         !product.allergens_tags.some(allergen => userInfo.allergen.includes(allergen))
       );

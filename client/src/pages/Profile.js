@@ -124,7 +124,7 @@ export default function Profile() {
   const modifySubstitute = async (e) => {
     e.preventDefault();
     const value = e.target.value;
-    toast.info(`En cours de modification ${value}`);
+    navigate('/', { state: { code: value } });
   };
 
   const deleteSubstitute = async (e) => {
