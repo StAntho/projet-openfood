@@ -102,6 +102,10 @@ export default function Home() {
         const response = await axios.patch('http://127.0.0.1:8000/api/substitute/set', data, { headers: { Authorization: `Bearer ${userInfo.token}` } });
         dispatch({ type: "USER_SIGNIN", payload: response.data });
         localStorage.setItem("userInfo", JSON.stringify(response.data));
+        setProducts([]);
+        setProductsReplace([]);
+        setSelectCat();
+        setSearchText('');
         toast.success('Votre substitut a bien été enregistré');
       } catch (error) {
         console.log(error);
@@ -191,7 +195,7 @@ export default function Home() {
         <select value={selectCat} onChange={handleCatChange}>
           <option value="">-- Choisissez votre catégorie --</option>
           {Object.entries(categories).map(([key, value]) => (
-            <option key={key} value={key}>{value}</option>
+            <option selected={key == selectCat} key={key} value={key}>{value}</option>
           ))}
         </select>
         <input
