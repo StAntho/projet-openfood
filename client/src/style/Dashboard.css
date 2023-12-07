@@ -4,3 +4,24 @@ h1.titleDashboard {
   margin: 15vh 0 5vh 0;
   text-align: center;
 }
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 10vh;
+  width: 80%;
+}
+
+button.modify-button {
+  margin: 1vw;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  background-color: #7b00ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #5600b3;
+  }
+}

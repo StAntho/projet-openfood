@@ -1,11 +1,12 @@
 import axios from "axios";
 import "../style/Dashboard.css";
-import { useEffect, useState } from "react";
-import { getErrorFromBackend } from "./../utils";
+import React, { useEffect, useState } from "react";
 import { useUser } from "../components/UserContext";
-import { toast } from "react-toastify";
-import ChartPie from "../components/ChartPie";
 import BarChart from "../components/BarChart";
+import Modal from "react-modal";
+import "../style/profile.css";
+
+Modal.setAppElement("#root");
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
@@ -15,6 +16,39 @@ export default function Dashboard() {
   const { state } = useUser();
   const { userInfo } = state;
   const token = userInfo.token;
+  const [modalProductIsOpen, setProductIsOpen] = React.useState(false);
+  const [modalSubstituteIsOpen, setSubstituteIsOpen] = React.useState(false);
+
+  function openModalProduct() {
+    setProductIsOpen(true);
+  }
+
+  function closeProductModal() {
+    setProductIsOpen(false);
+  }
+
+  function openModalSubstitute() {
+    setSubstituteIsOpen(true);
+  }
+
+  function closeSubstituteModal() {
+    setSubstituteIsOpen(false);
+  }
+
+  const customStyles = {
+    content: {
+      top: "55%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      width: "65%",
+      height: "80%",
+      marginTop: "5vh",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      overflow: "auto",
+    },
+  };
 
   useEffect(() => {
     const listUser = async () => {
@@ -27,7 +61,7 @@ export default function Dashboard() {
         setUsers(response.data);
         setUsersProducts(response.data.map((user) => user.products));
       } catch (error) {
-        toast.error(getErrorFromBackend(error));
+        console.log(error);
       }
     };
     listUser();
@@ -55,7 +89,7 @@ export default function Dashboard() {
             [substitutId]: substitutResponse.data.product,
           }));
         } catch (error) {
-          toast.error(getErrorFromBackend(error));
+          console.log(error);
         }
       });
       return "";
@@ -111,78 +145,105 @@ export default function Dashboard() {
           ))}
         </tbody>
       </table>
-      <h2>Produits</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Image</th>
-            <th>Nom</th>
-            <th>Catégories</th>
-            <th>Nb d'apparitions</th>
-            <th>Magazins</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(search).map((key) => (
-            <tr key={key}>
-              <td>{search[key].id}</td>
-              <td>
-                <img
-                  src={search[key].image_front_thumb_url}
-                  alt={search[key].product_name_fr}
-                />
-              </td>
-              <td>{search[key].product_name_fr}</td>
-              <td>{search[key].categories}</td>
-              <td>{nbsearch[search[key].id]}</td>
-              <td>{search[key].stores}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h2>Substituts</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Image</th>
-            <th>Nom</th>
-            <th>Catégories</th>
-            <th>Nb d'apparitions</th>
-            <th>Magazins</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(substitute).map((key) => (
-            <tr key={key}>
-              <td>{substitute[key].id}</td>
-              <td>
-                <img
-                  src={substitute[key].image_front_thumb_url}
-                  alt={substitute[key].product_name_fr}
-                />
-              </td>
-              <td>{substitute[key].product_name_fr}</td>
-              <td>{substitute[key].categories}</td>
-              <td>{nbsubstitut[substitute[key].id]}</td>
-              <td>{substitute[key].stores}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <button className="modify-button" onClick={openModalProduct}>
+        Voir les produits recherchés
+      </button>
+      <button className="modify-button" onClick={openModalSubstitute}>
+        Voir les substituts
+      </button>
 
       {/* <ChartPie plat={26} dessert={32} /> */}
-      <BarChart
-        nombre={nbsearch}
-        produits={search}
-        title={"Graphique des produits recherchés"}
-      />
-      <BarChart
-        nombre={nbsubstitut}
-        produits={substitute}
-        title={"Graphique des produits substituts"}
-      />
+      <Modal
+        isOpen={modalProductIsOpen}
+        onRequestClose={closeProductModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2>Produits</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Image</th>
+              <th>Nom</th>
+              <th>Catégories</th>
+              <th>Nb d'apparitions</th>
+              <th>Magazins</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(search).map((key) => (
+              <tr key={key}>
+                <td>{search[key].id}</td>
+                <td>
+                  <img
+                    src={search[key].image_front_thumb_url}
+                    alt={search[key].product_name_fr}
+                  />
+                </td>
+                <td>{search[key].product_name_fr}</td>
+                <td>{search[key].categories}</td>
+                <td>{nbsearch[search[key].id]}</td>
+                <td>{search[key].stores}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <BarChart
+          nombre={nbsearch}
+          produits={search}
+          title={"Graphique des produits recherchés"}
+        />
+        <button className="modify-button" onClick={closeProductModal}>
+          Fermer
+        </button>
+      </Modal>
+      <Modal
+        isOpen={modalSubstituteIsOpen}
+        onRequestClose={closeSubstituteModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2>Substituts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Image</th>
+              <th>Nom</th>
+              <th>Catégories</th>
+              <th>Nb d'apparitions</th>
+              <th>Magazins</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(substitute).map((key) => (
+              <tr key={key}>
+                <td>{substitute[key].id}</td>
+                <td>
+                  <img
+                    src={substitute[key].image_front_thumb_url}
+                    alt={substitute[key].product_name_fr}
+                  />
+                </td>
+                <td>{substitute[key].product_name_fr}</td>
+                <td>{substitute[key].categories}</td>
+                <td>{nbsubstitut[substitute[key].id]}</td>
+                <td>{substitute[key].stores}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <BarChart
+          nombre={nbsubstitut}
+          produits={substitute}
+          title={"Graphique des produits substituts"}
+        />
+        <button className="modify-button" onClick={closeSubstituteModal}>
+          Fermer
+        </button>
+      </Modal>
     </div>
   );
 }
